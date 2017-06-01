@@ -11,14 +11,6 @@ function Square(props) {
 }
 
 class Board extends React.Component {
-    constructor() {
-        super();
-        this.state = {
-            squares: Array(9).fill(null),
-            xIsNext: true,
-        };
-    }
-
     handleClick(i) {
         const squares = this.state.squares.slice();
         squares[i] = this.state.xIsNext ? 'X' : 'O';
@@ -30,8 +22,8 @@ class Board extends React.Component {
     renderSquare(i) {
         return (
              <Square 
-                value = {this.state.squares[i]}
-                onClick={() => this.handleClick(i)}
+                value = {this.prop.squares[i]}
+                onClick={() => this.props.onClick(i)}
             />
         );
     }
@@ -46,8 +38,7 @@ class Board extends React.Component {
         }
 
         return ( 
-            <div>
-                <div className = "status" > { status } </div> 
+            <div> 
                 <div className = "board-row" > 
                     { this.renderSquare(0) } 
                     { this.renderSquare(1) } 
@@ -69,16 +60,39 @@ class Board extends React.Component {
 }
 
 class Game extends React.Component {
+    constructor() {
+        super();
+        this.state = {
+            history: [{
+                squares: Array(9).fill(null),
+            }],
+            xIsNext: true;
+        };
+    }
     render() {
+        const history = this.state.history;
+        const current = history[history.length - 1];
+        const winner = calculateWinner(current.squares);
+
+        let status;
+        if (winner) {
+            status = 'Winner: ' + winner;
+        } else {
+            status = 'Next Player: ' + (this.state.xIsNext ? 'X' : 'O');
+        }
+
         return ( 
             <div className = "game" >
-            <div className = "game-board" >
-            <Board / >
-            </div> 
-            <div className = "game-info" >
-            <div > { /* status */ } </div> 
-            <ol > { /* TODO */ } </ol> 
-            </div> 
+                <div className = "game-board" >
+                    <Board / >
+                        squares={current.squares}
+                        onClick={(i) => this.handleClick(i)}
+                        />
+                </div> 
+                <div className = "game-info" >
+                    <div>{status}</div> 
+                    <ol>{/* TODO */}</ol> 
+                </div> 
             </div>
         );
     }
